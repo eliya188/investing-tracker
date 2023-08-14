@@ -1,0 +1,5 @@
+myenv
+.vscode
+__pycache__
+requirement.txt
+backend/db.sqlite3
