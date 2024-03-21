@@ -30,12 +30,23 @@ def signup(request):
         user = Profile.objects.create_user(username=username, email=email, password=password)
         user_serializer = ProfileSerializers(user)
 
-        refresh = RefreshToken.for_user(user)
-        tokens = {
-            'refresh': str(refresh),
-            'access': str(refresh.access_token),
+        payload = {
+            'id': user.id,
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=60),
+            'iat': datetime.datetime.utcnow()
         }
-        return JsonResponse({'user': user_serializer.data, 'tokens': tokens}, status=201)
+
+        token = jwt.encode(payload, 'secret', algorithm='HS256')
+
+        response = HttpResponse("sign in", status=status.HTTP_200_OK)
+
+        response.set_cookie(key='jwt', value=token, httponly=True)
+        response.data = {
+            'jwt': token,
+            'user': user_serializer.data
+        }
+
+        return response
     return HttpResponse(serialized_data.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
@@ -53,7 +64,7 @@ def signin(request):
 
         payload = {
             'id': user.id,
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=60),
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=3),
             'iat': datetime.datetime.utcnow()
         }
 
@@ -63,7 +74,8 @@ def signin(request):
 
         response.set_cookie(key='jwt', value=token, httponly=True)
         response.data = {
-            'jwt': token
+            'jwt': token,
+            'user': user
         }
 
         return response
@@ -72,19 +84,10 @@ def signin(request):
     
     
 @api_view(['GET'])
-def remove_user(request):
-    token = request.COOKIES.get('jwt')
-    
-    if not token:
-        raise AuthenticationFailed("Unautenticated")
-    
-    try:
-        payload = jwt.decode(token, 'secret', algorithms='HS256')
-    except jwt.ExpiredSignatureError:
-        raise AuthenticationFailed("Unautenticated")
-
-    print(payload['id'])
-    user = Profile.objects.filter(id=payload['id'])
+@validate_token
+def remove_user(request, user_id):
+    user = Profile.objects.filter(id=user_id)
+    print(user)
     serializer = ProfileSerializers(user)
     print(serializer.data)
     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)

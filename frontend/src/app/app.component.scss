@@ -1,0 +1,64 @@
+// styles.scss or main-component.scss
+
+// body {
+//   position: fixed;
+//   top: 0;
+//   left: 0;
+//   width: 100vw;
+//   height: 100vh;
+// }
+/* app.component.scss */
+
+:host {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Adjust as needed */
+  margin: 0;
+}
+
+h1 {
+  
+  margin: 0px;
+  text-align: center;
+  color: #930ec1a1;
+  font-size: 10rem;
+  text-shadow: 0px 0px 9px #507570, 0 0 5px #00FFFF;/* Adjust text color as needed */
+  animation: slideInCenter 2s ease-out infinite; 
+}
+
+.container {
+
+  position: relative;
+  width: 100%;
+  height: 100%;
+  // overflow: hidden;
+}
+
+.square {
+  position: absolute;
+  background-color: #3498db; // Adjust the color as needed
+  animation: rise 5s ease infinite; 
+  
+  @for $i from 1 through 20 {
+    &:nth-child(#{$i}) {
+      $size: random(150) + 50px;
+      width: $size;
+      height: $size; 
+      left: random(99) + 1%; 
+    }
+  }
+}
+
+@keyframes slideFromCorner {
+  from{
+    top: 0px;
+    left: 200px;
+    opacity: 0.2;
+  }
+  to{
+    top: 100px;
+    left: 500px;
+    opacity: 1;
+  }
+}

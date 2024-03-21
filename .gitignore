@@ -3,3 +3,4 @@ myenv
 __pycache__
 requirement.txt
 backend/db.sqlite3
+migrations
