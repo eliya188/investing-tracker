@@ -9,6 +9,13 @@
 // }
 /* app.component.scss */
 
+.navbar {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  /* Add your preferred styling here */
+}
+
 :host {
   display: flex;
   justify-content: center;
